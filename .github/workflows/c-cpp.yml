@@ -14,7 +14,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: change directory
+    - name: build
       run: |
         cd beginner/cgpa_calculator
         cmake .
@@ -40,7 +40,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: change directory
+    - name: build
       run: |
         cd beginner/cassino_number_guessing
         cmake .
@@ -53,7 +53,7 @@ jobs:
 
   #   steps:
   #   - uses: actions/checkout@v3
-  #   - name: change directory
+  #   - name: build
   #     run: |
         # cd beginner/login_and_registration_system
         # cmake .
