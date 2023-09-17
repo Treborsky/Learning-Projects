@@ -15,17 +15,8 @@
 
 namespace fs = std::filesystem;
 
-namespace database {
-
-class Writer {
-public:
-    Writer() = default;
-
-    
-
-private:
-
-};
+typedef std::string Login;
+typedef std::string Password;
 
 class FileHandler {
 public:
@@ -42,15 +33,25 @@ public:
         std::cout << "Database directory: " << path_to_database << std::endl;
     }
 
+    ~FileHandler() {
+        CloseFile();
+    }
+
     const fs::path GetPath() const {
         return path_to_database;
     }
 
     std::fstream& GetFileHandle() {
         if (not database_file.is_open()) {
-            database_file.open(path_to_database, std::ios::out | std::ios::binary);
+            database_file.open(path_to_database, std::ios::in | std::ios::out);
         }
         return database_file;
+    }
+
+    void CloseFile() {
+        if (database_file.is_open()) {
+            database_file.close();
+        }
     }
 
 private:
@@ -63,9 +64,20 @@ private:
 class Handler {
 public:
     Handler(std::unique_ptr<FileHandler> database_file_handler) 
-        : db_file_handler{std::move(database_file_handler)}
-    {
+        : db_file_handler{std::move(database_file_handler)} {}
 
+    void Write(const std::string& data) {
+        db_file_handler->GetFileHandle() << data;
+        db_file_handler->CloseFile();
+    }
+
+    std::string Read() const {
+        auto& db = db_file_handler->GetFileHandle();
+        std::string data;
+        db >> data;
+        std::cout << "data: " << data << std::endl;
+        db_file_handler->CloseFile();
+        return data;
     }
 
 private:
@@ -73,7 +85,10 @@ private:
 
 };
 
-} // namespace database
-
 int main() {
+    auto file_handler = std::make_unique<FileHandler>();
+    auto handler = Handler{std::move(file_handler)};
+
+    handler.Write("Hello World");
+    std::cout << handler.Read() << std::endl;
 }
